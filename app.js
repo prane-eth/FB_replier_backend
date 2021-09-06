@@ -44,30 +44,6 @@ const updateMessages = (messages, pageID) => {
   });
 }
 
-// const getOldMessages = (pageID, callback) => {
-//   MongoClient.connect(uri, function(err, client) {
-//     if (err)
-//       return console.log("Error connecting to DB ");
-
-//     var collectionName = 'page' + pageID
-//     var db = client.db('myFirstDatabase')
-//     var collection = db.collection(collectionName)
-//     console.log(collectionName)
-
-//     try {
-//       // find collections which have _id != 0
-//       collection.find({_id: { $ne: '0' }}).toArray(function (err, response) {
-//         if (err)
-//           console.log('error' + err.toString())
-//         callback(response, client)
-//       });
-//       // client.close();
-//     } catch (err) {
-//       console.log('Error loading old messages')
-//     }
-//   });
-// }
-
 
 
 // Socket.io part
@@ -106,17 +82,21 @@ io.on("connection", socket => {
     updateMessages(messages, pageID);
   })
   socket.on('requestOldMessages', (pageID) => {
+    console.log('got request for old messages')
     this.message = null
-    // request({
-    //   'uri': 'https://localhost:5000/oldMessages/'+pageID,
-    //   'qs': { 'access_token': pageToken },
-    //   'method': 'POST',
-    //   'json': requestBody
-    // }, (err, res, _body) => {
-    //   if (err)
-    //     console.error('Unable to send message:' + err);
-    //   socket.emit('oldMessages', res)
-    // });
+    request({
+      'uri': 'http://localhost:5000/oldMessages/'+pageID,
+      'method': 'GET'
+    }, (err, _res, body) => {
+      if (err)
+        console.error('Unable to send message:' + err.toString());
+      
+      body = JSON.parse(body)
+      body = body[0]
+      socket.emit('oldMessages', body)
+      console.log('sent old messages')
+      console.log(body)
+    });
   })
 });
 
@@ -163,9 +143,6 @@ app.get('/oldMessages/:pageID', function (req, res) {
     var collectionName = 'page' + pageID
     var db = client.db('myFirstDatabase')
     var collection = db.collection(collectionName)
-
-    // To handle Error: No 'Access-Control-Allow-Origin' header is present on the requested resource.
-    
 
     try {
       collection.find({_id: { $ne: '0' }}).toArray((err, arr) => {
@@ -224,8 +201,6 @@ app.post('/webhook', (req, res) => {   // POST request is for receiving messages
       // pass the event to the appropriate handler function
       if (event.message)
         handleMessage(userID, msgText, sendTime);
-      // else if (event.postback)
-      //   handlePostback(userID, event.postback);
     });
     res.status(200).send('EVENT_RECEIVED');  // status 200 OK
   } else {
@@ -267,18 +242,5 @@ const sendMessage = (userID, msgText, pageToken='') => {
   });
 }
 
-// // Handles messaging_postbacks events
-// function handlePostback(userID, receivedPostback) {
-//   let response;
-//   // Get the payload for the postback
-//   let payload = receivedPostback.payload;
-//   // Set the response based on the postback payload
-//   if (payload === 'yes') {
-//     response = { 'text': 'Thanks!' };
-//   } else if (payload === 'no') {
-//     response = { 'text': 'Oops, try sending another image.' };
-//   }
-//   sendMessage(userID, response);   // Send the message to acknowledge the postback
-// }
 httpServer.listen(port);
 console.log('Your app is listening on port ' + port);
