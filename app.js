@@ -74,7 +74,7 @@ const updateMessages = (messages, pageID) => {
 
 var app = express();
 
-var port = 5000;
+var port = process.env.PORT || 5000;
 
 var httpServer = require("http").createServer(app);
 const io = require("socket.io")(httpServer, {
