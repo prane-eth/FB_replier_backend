@@ -85,7 +85,8 @@ io.on("connection", socket => {
     console.log('got request for old messages')
     this.message = null
     request({
-      'uri': 'http://localhost:5000/oldMessages/'+pageID,
+      'uri': 'http://rpanel-be.herokuapp.com/oldMessages/'+pageID,
+      // 'uri': 'http://localhost:5000/oldMessages/'+pageID,
       'method': 'GET'
     }, (err, _res, body) => {
       if (err)
