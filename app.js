@@ -95,7 +95,7 @@ io.on("connection", socket => {
       body = body[0]
       socket.emit('oldMessages', body)
       console.log('sent old messages')
-      console.log(body)
+      // console.log(body)
     });
   })
 });
@@ -120,7 +120,7 @@ To run this code:
 
 // Webhook server code
 
-// Parse application/x-www-form-urlencoded
+
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());  // Parse application/json
 // app.use(cors({origin: 'http://localhost:3000'}));
