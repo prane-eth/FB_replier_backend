@@ -79,7 +79,9 @@ io.on("connection", socket => {
   });
 
   socket.on('updateMessages', (messages, pageID) => {
+    console.log('storing new messages');
     updateMessages(messages, pageID);
+    console.log('stored new messages')
   })
   socket.on('requestOldMessages', (pageID) => {
     console.log('got request for old messages')
